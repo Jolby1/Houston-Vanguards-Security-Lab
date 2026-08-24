@@ -1,0 +1,52 @@
+# Credentials and secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.pfx
+*.p12
+*.secret
+secrets/
+credentials/
+
+# Terraform local data and sensitive values
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+*.tfplan
+crash.log
+crash.*.log
+
+# Virtual machines and installation media
+*.iso
+*.img
+*.qcow2
+*.vdi
+*.vmdk
+*.vhd
+*.vhdx
+*.ova
+
+# Python-generated files
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# PowerShell and local logs
+*.log
+*.transcript
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
+*~
