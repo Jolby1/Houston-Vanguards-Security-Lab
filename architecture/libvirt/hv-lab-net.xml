@@ -1,0 +1,10 @@
+<network>
+  <name>hv-lab-net</name>
+  <forward mode="nat"/>
+  <bridge name="virbr10" stp="on" delay="0"/>
+  <ip address="10.50.10.1" prefix="24">
+    <dhcp>
+      <range start="10.50.10.100" end="10.50.10.199"/>
+    </dhcp>
+  </ip>
+</network>
