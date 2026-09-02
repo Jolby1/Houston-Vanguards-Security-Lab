@@ -85,4 +85,36 @@ Initial systems will use:
 - Domain clients must use the domain controller for DNS rather than public or household DNS.
 - The NAT boundary is useful isolation but is not a substitute for host and guest security controls.
 
+## ADR-003 — Begin at Windows Server 2016 AD Functional Level
 
+- **Date:** 2026-09-01
+- **Status:** Accepted
+
+### Context
+
+The `corp.hv-lab.test` forest will be created on a Windows Server 2025 domain controller. Windows Server 2025 supports both the Windows Server 2016 and Windows Server 2025 forest and domain functional levels.
+
+The functional-level decision affects which Windows Server versions can operate as domain controllers and which Active Directory capabilities are available.
+
+### Decision
+
+Create the forest and domain at the Windows Server 2016 functional level.
+
+### Reasons
+
+- The Windows Server 2016 functional level supports domain controllers running Windows Server 2016, 2019, 2022, and 2025.
+- It includes Active Directory capabilities relevant to the project, including PAM-related features, authentication policies, and authentication policy silos.
+- It provides flexibility to test mixed-version domain-controller scenarios.
+- The project can later assess compatibility and perform a deliberate functional-level upgrade to Windows Server 2025.
+- A later upgrade provides an additional architecture, change-management, validation, and troubleshooting exercise.
+
+### Alternatives Considered
+
+- **Windows Server 2025 functional level:** Provides the newest AD capabilities, including support for the optional 32K database-page feature, but permits only Windows Server 2025 domain controllers.
+
+### Consequences
+
+- Windows Server 2025-only functional-level features will not initially be available.
+- The environment retains compatibility with older supported domain-controller versions.
+- A future functional-level upgrade will require compatibility assessment, validation, documentation, and a recovery plan.
+- Raising the functional level is a consequential change and should not be treated as easily reversible.
