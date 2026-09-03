@@ -52,3 +52,63 @@ Hardware support alone does not guarantee that a feature is available to the ope
 
 The investigation also reinforced the importance of collecting evidence before changing the system. The virtualization flags, kernel modules, error message, and device checks identified the affected layer and allowed the root cause to be confirmed without installing unrelated software or making unnecessary configuration changes.
 
+## Incident 002 — Secure Boot Disabled Despite Secure Firmware
+
+### Problem
+
+After installing Windows Server 2025, TPM 2.0 was present and ready, but `Confirm-SecureBootUEFI` returned `False`.
+
+### Evidence Collected
+
+- The VM used `OVMF_CODE_4M.secboot.fd`.
+- The firmware loader was marked `secure='yes'`.
+- SMM was enabled.
+- TPM 2.0 was present and ready.
+- The NVRAM template was `OVMF_VARS_4M.fd`.
+- The libvirt definition showed `enrolled-keys` set to `no`.
+- The host contained the Microsoft-key template `OVMF_VARS_4M.ms.fd`.
+
+### Hypotheses
+
+1. The VM was using ordinary UEFI instead of Secure Boot firmware.
+2. SMM was not enabled.
+3. Microsoft Secure Boot keys were not enrolled.
+4. The firmware and NVRAM templates were mismatched.
+
+### Root Cause
+
+The VM used Secure Boot-capable firmware, but its NVRAM was initialized without enrolled Microsoft keys. Libvirt therefore exposed UEFI firmware while Windows correctly reported that Secure Boot was disabled.
+
+### Unsuccessful Change Attempt
+
+An initial attempt changed only the NVRAM template path to `OVMF_VARS_4M.ms.fd`. Libvirt rejected the edited definition because it could not match that manual combination to a compatible registered EFI firmware configuration.
+
+The forced-save option was not used. The invalid change was discarded, preventing an unsupported configuration from being applied.
+
+### Fix
+
+The existing VM XML and NVRAM were backed up. The libvirt firmware configuration was changed to request both Secure Boot and enrolled keys. Explicit loader and NVRAM selections were removed so libvirt could select its registered compatible firmware pair.
+
+The VM was then started using the `--reset-nvram` option, which initialized NVRAM from the compatible Microsoft-key template.
+
+### Verification
+
+After Windows started, the following command returned `True`:
+
+```powershell
+Confirm-SecureBootUEFI
+```
+
+TPM validation also continued to report that TPM 2.0 was present and ready.
+
+### Lesson Learned
+
+Secure Boot requires more than Secure Boot-capable firmware. The VM also needs enrolled trusted keys, compatible NVRAM, SMM, and a supported firmware configuration.
+
+The incident also demonstrated the value of:
+
+- Inspecting the effective VM definition
+- Using registered firmware profiles
+- Creating recovery copies before changing boot state
+- Rejecting an invalid configuration instead of forcing it
+- Verifying security controls from inside the guest operating system
