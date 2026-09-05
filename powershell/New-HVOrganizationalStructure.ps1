@@ -150,6 +150,12 @@ catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
     }
 }
 
+if ($WhatIfPreference) {
+    Write-Host "`nPREVIEW COMPLETE: No organizational units were created." `
+        -ForegroundColor Cyan
+    return
+}
+
 $rootOU = Get-ADOrganizationalUnit `
     -Identity $rootDN `
     -ErrorAction SilentlyContinue
