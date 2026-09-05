@@ -123,9 +123,16 @@ $organizationalUnits = @(
 
 foreach ($ou in $organizationalUnits) {
     $ouDN = "OU=$($ou.Name),$($ou.Path)"
+    $existingOU = $null
+
+try {
     $existingOU = Get-ADOrganizationalUnit `
         -Identity $ouDN `
-        -ErrorAction SilentlyContinue
+        -ErrorAction Stop
+}
+catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
+    $existingOU = $null
+}
 
     if ($null -ne $existingOU) {
         Write-Host "EXISTS: $ouDN" -ForegroundColor Yellow
