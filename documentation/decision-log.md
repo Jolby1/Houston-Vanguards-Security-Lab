@@ -118,3 +118,49 @@ Create the forest and domain at the Windows Server 2016 functional level.
 - The environment retains compatibility with older supported domain-controller versions.
 - A future functional-level upgrade will require compatibility assessment, validation, documentation, and a recovery plan.
 - Raising the functional level is a consequential change and should not be treated as easily reversible.
+
+## ADR-004 — Separate Policy Structure from Business Access
+
+- **Date:** 2026-09-12
+- **Status:** Accepted
+
+### Context
+
+Houston Vanguards contains multiple workforce types, departments, privileged roles, devices, and non-human identities. The Active Directory structure must support Group Policy, delegated administration, identity lifecycle management, and resource authorization without tightly coupling the directory to an organizational chart that may change.
+
+### Decision
+
+Use organizational units for policy, lifecycle, and administrative boundaries. Use security groups for department membership, business roles, privileged roles, and resource permissions.
+
+Create separate OUs for:
+
+- Human identity types
+- Privileged identity tiers
+- Managed and legacy service accounts
+- Servers and workstations
+- Department, role, and resource groups
+
+Use separate Tier 0, Tier 1, and Tier 2 administrative identities. Do not grant routine administrative rights to standard user accounts.
+
+### Reasons
+
+- OUs provide Group Policy and delegated-administration boundaries.
+- Groups can represent changing department and role membership without repeatedly restructuring the directory.
+- Separate privileged identities reduce credential exposure.
+- Administrative tiers limit where privileged credentials should be used.
+- The structure supports AGDLP-based authorization.
+- Service accounts require controls different from human identities.
+
+### Alternatives Considered
+
+- **Department-based OU tree:** Easy to visualize, but couples directory structure to frequently changing business organization.
+- **Flat directory structure:** Simple initially, but makes policy targeting, delegation, and lifecycle separation difficult.
+- **Direct user permissions:** Easy for a small environment, but difficult to audit, scale, and remove consistently.
+
+### Consequences
+
+- Group naming and nesting standards must be followed consistently.
+- Administrators require separate accounts for different trust levels.
+- More objects must be created and maintained than in a flat design.
+- Group Policy must be linked carefully to avoid unintended inheritance.
+- Tier enforcement will remain incomplete until dedicated administrative workstations and supporting controls are introduced.
