@@ -160,3 +160,40 @@ Legacy service accounts must have:
 ## Initial Limitations
 
 This is a simplified single-forest lab. Separate administrative forests, privileged-access workstations, advanced delegation, and time-limited privilege will be introduced only when the environment can support and validate them.
+
+
+## AGDLP Authorization Model
+
+The Houston Vanguards domain will use AGDLP for access authorization:
+
+**Accounts → Global Groups → Domain Local Groups → Permissions**
+
+User and computer accounts will be placed into global groups based on business membership or role. Global groups will then be placed into domain-local groups representing access to specific resources. Permissions will be assigned to the domain-local groups.
+
+### Pilot Access Model
+
+The initial pilot will use the following authorization path:
+
+`jrodriguez → GG-Dept-IT → DL-FS-IT-Shared-RW → Read/write access to the IT shared folder`
+
+The following group types will be used:
+
+- `GG-Dept-*` for department membership.
+- `GG-Role-*` for job-role membership.
+- `DL-*-RO` for read-only resource access.
+- `DL-*-RW` for read/write resource access.
+
+### Reasons
+
+- Users do not receive resource permissions directly.
+- Department and role membership can change without modifying resource permissions.
+- Resource permissions remain understandable and auditable.
+- The model supports least privilege and scales better than assigning permissions individually.
+- Global groups describe who users are, while domain-local groups describe what access is granted.
+
+### Consequences
+
+- More groups must be created and maintained.
+- Group naming and nesting must remain consistent.
+- Troubleshooting requires checking each layer of the authorization chain.
+- Incorrect group nesting could grant excessive access.
