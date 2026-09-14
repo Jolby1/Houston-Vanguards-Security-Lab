@@ -30,3 +30,20 @@ The SHA-256 value was cross-checked against an independent catalog for the same 
 - Internet activation required within the first 10 days after installation to avoid automatic shutdown
 - Intended only for lab and evaluation use
 - Latest servicing updates must be installed after deployment
+
+## Windows 11 Enterprise Evaluation
+
+- **Purpose:** Installation media for the `HV-WIN01` domain client
+- **Product:** Windows 11 Enterprise Evaluation, 64-bit
+- **Release:** 25H2
+- **Language:** English (United States)
+- **Source:** Microsoft Evaluation Center
+- **Source URL:** https://www.microsoft.com/en-us/evalcenter/download-windows-11-enterprise
+- **Download date:** 2026-09-14
+- **Filename:** `26200.6584.250915-1905.25h2_ge_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso`
+- **Size:** `7,092,807,680 bytes`
+- **SHA-256:** `a61adeab895ef5a4db436e0a7011c92a2ff17bb0357f58b13bbc4062e535e7b9`
+- **File location:** Stored outside the Git repository under `~/Virtualization/ISO`
+- **Validation:** Confirmed as a bootable ISO 9660 filesystem with volume label `CENA_X64FREE_EN-US_DV9`
+
+The SHA-256 value provides a local integrity baseline for detecting later changes to the downloaded file. Because it was not compared against a separately published Microsoft checksum, it does not independently prove authenticity. Authenticity is based on obtaining the file directly from the Microsoft Evaluation Center over HTTPS.
