@@ -164,3 +164,62 @@ Use separate Tier 0, Tier 1, and Tier 2 administrative identities. Do not grant 
 - More objects must be created and maintained than in a flat design.
 - Group Policy must be linked carefully to avoid unintended inheritance.
 - Tier enforcement will remain incomplete until dedicated administrative workstations and supporting controls are introduced.
+
+## ADR-005 — Separate Group Policies by Target and Purpose
+
+**Date:** 2026-09-16  
+**Status:** Accepted
+
+### Context
+
+The Houston Vanguards domain requires security settings for domain accounts, domain controllers, workstations, auditing, and local-administrator management.
+
+Placing all settings in one broadly linked GPO would make scope, troubleshooting, testing, and rollback difficult. Modifying the default policies for unrelated controls would also increase the risk of unintended domain-wide effects.
+
+### Decision
+
+Group Policy will be separated by target and purpose.
+
+- Domain password, lockout, and Kerberos policy will remain associated with the domain-level account-policy design.
+- Domain-controller policy will remain separate from workstation policy.
+- General workstation controls will use `HVL-Workstation-Security-Baseline`.
+- Advanced workstation auditing will use `HVL-Workstation-Audit`.
+- Windows LAPS settings will use `HVL-LAPS-Workstations` after its prerequisites are evaluated.
+- Workstation computer policies will be linked to the Workstations OU.
+- User Configuration will be disabled in computer-only GPOs.
+- Enforced and Block Inheritance will not be used without a documented requirement.
+
+### Reasons
+
+- Narrow scope reduces unintended policy application.
+- Purpose-specific GPOs are easier to understand and audit.
+- Independent GPOs can be tested, disabled, and rolled back separately.
+- Separating audit settings improves evidence collection and troubleshooting.
+- Preserving the intended role of default policies reduces operational risk.
+- OU-based targeting aligns policy with the existing Active Directory structure.
+
+### Alternatives Considered
+
+#### Place all settings in the Default Domain Policy
+
+Rejected because unrelated workstation settings would apply too broadly and make the default policy harder to maintain.
+
+#### Create one GPO containing every workstation control
+
+Rejected because a single failure would make individual control rollback and troubleshooting more difficult.
+
+#### Use Enforced links for all security GPOs
+
+Rejected because Enforced changes normal precedence and inheritance behavior without a current business requirement.
+
+#### Use security filtering for every initial policy
+
+Deferred because the Workstations OU already provides a clear initial scope. Additional filtering would introduce complexity before it is needed.
+
+### Consequences
+
+- Multiple GPOs must be named, documented, backed up, and maintained.
+- Administrators must understand GPO link order and effective policy.
+- Troubleshooting may require examining several policies.
+- The design provides clearer ownership, safer testing, and more precise rollback.
+- Additional GPOs may be introduced later as new security requirements appear.
