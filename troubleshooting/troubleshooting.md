@@ -112,3 +112,73 @@ The incident also demonstrated the value of:
 - Creating recovery copies before changing boot state
 - Rejecting an invalid configuration instead of forcing it
 - Verifying security controls from inside the guest operating system
+
+
+## Workstation GPO Did Not Apply Because Its OU Link Was Missing
+
+**Date:** 2026-09-17  
+**Affected systems:** `HV-DC01`, `HV-WIN01`  
+**Status:** Resolved
+
+### Expected Behavior
+
+`HVL-Workstation-Security-Baseline` should have applied its computer settings to `HV-WIN01`, which resides in the Workstations OU.
+
+### Observed Behavior
+
+`gpresult /scope computer /r` on `HV-WIN01` showed only the Default Domain Policy. The custom workstation baseline was absent, and the expected inactivity registry value did not exist.
+
+An initial validation was accidentally performed on `HV-DC01`. Its results correctly showed that the workstation GPO did not apply to the Domain Controllers OU.
+
+### Troubleshooting Process
+
+The following layers were checked independently:
+
+1. Confirmed that `HV-WIN01` was located in the Workstations OU.
+2. Confirmed that the custom GPO existed.
+3. Confirmed that Computer Configuration was enabled.
+4. Inspected Group Policy inheritance for the Workstations OU.
+5. Reviewed GPO application permissions.
+6. Refreshed policy on the intended workstation.
+7. Validated effective policy with `gpresult`.
+8. Validated the resulting security settings directly.
+
+### Root Cause
+
+The GPO had been created and configured but had not been linked to the Workstations OU.
+
+Creating a GPO does not assign it to any users or computers. A link is required to establish its scope.
+
+### Resolution
+
+The GPO was linked to:
+
+`OU=Workstations,OU=Devices,OU=Houston Vanguards,DC=corp,DC=hv-lab,DC=test`
+
+Computer policy was refreshed on `HV-WIN01`.
+
+### Validation
+
+After linking:
+
+- `gpresult` listed `HVL-Workstation-Security-Baseline` as applied.
+- The 15-minute inactivity control became effective.
+- LLMNR was disabled.
+- Microsoft Defender and real-time protection were enabled.
+- All firewall profiles were enabled.
+- The local Guest account was disabled.
+- The GPO did not apply to `HV-DC01`.
+
+The separate `HVL-Workstation-Audit` GPO was later linked to the same OU. Its effective audit settings were confirmed with `auditpol`, and a test launch of Notepad generated Security event ID 4688.
+
+### Lessons Learned
+
+A complete GPO deployment requires four distinct stages:
+
+`Create → Configure → Link → Validate`
+
+The GPO editor shows intended configuration, while `gpresult`, registry checks, security tools, and event logs show effective behavior.
+
+Testing from the wrong computer can produce misleading results. Verifying `hostname` and the current security context should be an early troubleshooting step.
+
+A missing setting should not be corrected manually on the endpoint until GPO scope, links, permissions, and effective policy have been examined.
