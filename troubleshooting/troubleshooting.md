@@ -116,8 +116,8 @@ The incident also demonstrated the value of:
 
 ## Workstation GPO Did Not Apply Because Its OU Link Was Missing
 
-**Date:** 2026-09-17  
-**Affected systems:** `HV-DC01`, `HV-WIN01`  
+**Date:** 2026-09-17
+**Affected systems:** `HV-DC01`, `HV-WIN01`
 **Status:** Resolved
 
 ### Expected Behavior
