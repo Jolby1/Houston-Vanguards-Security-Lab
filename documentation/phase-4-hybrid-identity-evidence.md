@@ -13,5 +13,7 @@
 - Assigned the Reader role at the resource-group scope.
 - Confirmed the synchronized user can view `rg-hv-identity-lab`.
 - Confirmed the cloud identity design uses least-privilege group-based RBAC.
+- Read access to `rg-hv-identity-lab` succeeded for `jrodriguez`.
+- A resource-group tag update was denied with `AuthorizationFailed`, confirming the Reader boundary.
 
 The pilot demonstrates one-way identity synchronization from Active Directory to Microsoft Entra ID and controlled Azure resource access.
