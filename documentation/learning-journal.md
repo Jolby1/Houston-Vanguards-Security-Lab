@@ -132,3 +132,14 @@ Phases 0 through 2 have been completed. Phase 3 security-baseline, auditing, fil
 - Record the final lessons learned and controlled-failure evidence.
 - Continue to the next phase only after the Phase 3 documentation is complete.
 - Do not begin Azure implementation until the project plan reaches that phase.
+
+## Phase 4 — Hybrid Identity Lessons Learned
+
+- Microsoft Entra Cloud Sync requires a native Entra member account for agent registration; a personal guest identity cannot register the agent.
+- The provisioning agent should run on a dedicated domain-member server.
+- Security-group scoping requires the exact Active Directory distinguished name.
+- Group-scope filtering evaluates direct members and is best used for controlled pilot scenarios.
+- Successful Create and Update events confirmed the AD-to-Entra synchronization flow.
+- Password hash synchronization and MFA were validated.
+- Group-based Azure RBAC successfully provided Reader access.
+- A denied resource-group tag update confirmed that the synchronized user did not have write permissions.
