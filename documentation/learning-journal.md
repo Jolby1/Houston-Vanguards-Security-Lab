@@ -6,7 +6,7 @@ This project is a hands-on security engineering lab designed to develop and demo
 
 ## Business Scenario
 
-The lab models the Houston Vanguards, a fictional professional baseball organization with approximately 1,500 workforce identities. The simulated environment includes employees, contractors, seasonal workers, privileged administrators, service accounts, application identities, and multiple business departments.
+The lab models the Houston Vanguards, a fictional professional baseball organization with approximately 1,500 workforce identities. The business design includes employees, contractors, seasonal workers, privileged administrators, service accounts, application identities, and multiple departments. The deployed pilot is much smaller; application identity scenarios remain future work.
 
 ## Learning Objectives
 
@@ -23,15 +23,15 @@ Through this project, I will learn to:
 
 ## Current Phase
 
-Phase 3 — Active Directory security baseline, resource authorization, and Windows LAPS.
+Phase 5 — Identity automation and infrastructure-as-code discovery.
 
-The current work focuses on applying workstation security controls, validating Group Policy inheritance and enforcement, implementing AGDLP-based file-share authorization, building a domain-member file server, and deploying Windows LAPS for local administrator password management.
+The current work builds on the completed AD and Entra pilot with PowerShell inventory, Python reporting and Terraform discovery. Controlled lifecycle automation and measured results remain in progress.
 
 ## Status
 
 In progress.
 
-Phases 0 through 2 have been completed. Phase 3 security-baseline, auditing, file-share authorization, and LAPS implementation work has been completed and validated. Final documentation, evidence collection, and lessons learned remain.
+Phases 0 through 4 were completed and their closure was confirmed by the operator. Phase 5 is open. See [project status](project-status.md) and the [evidence index](evidence-index.md) for precise completion boundaries.
 
 ## Phase 0 — Workstation and Repository Preparation
 
@@ -56,7 +56,8 @@ Phases 0 through 2 have been completed. Phase 3 security-baseline, auditing, fil
 
 ## Phase 2 — Identity Model and Workstation Foundation
 
-- Created standard, Tier 0, and service identities.
+- Created standard and Tier 0 identities and sample employee, contractor and seasonal users.
+- Designed service-account OUs; the later Cloud Sync deployment introduced a gMSA. Generic application service identities are not claimed as deployed.
 - Created departmental and role-based security groups.
 - Applied the AGDLP group design.
 - Built `HV-WIN01` using Windows 11 Enterprise Evaluation media.
@@ -79,7 +80,7 @@ Phases 0 through 2 have been completed. Phase 3 security-baseline, auditing, fil
 - Configured advanced audit policy.
 - Validated effective policy with `gpresult`.
 - Validated process-creation auditing with Security Event ID 4688.
-- Documented and corrected a controlled Group Policy linking failure.
+- Documented and corrected an observed missing Group Policy link.
 
 ### File Server and AGDLP Authorization
 
@@ -113,6 +114,39 @@ Phases 0 through 2 have been completed. Phase 3 security-baseline, auditing, fil
 - Confirmed `jrodriguez` cannot retrieve or decrypt the password.
 - Confirmed the domain controller prevents ordinary users from logging on interactively.
 
+## Phase 4 — Hybrid Identity
+
+- Created an Azure subscription, resource group, tags and budget alerts.
+- Built and domain-joined HV-SYNC01 as the dedicated Cloud Sync host.
+- Registered the agent with a cloud-native setup identity and configured its gMSA.
+- Scoped the pilot to GG-Cloud-Sync-Pilot with jrodriguez as a direct member.
+- Confirmed the synchronized user and group appeared in Entra with expected membership.
+- Observed successful Create and Update provisioning events.
+- Completed cloud sign-in with the AD password and MFA.
+- Added the synchronized user to a separate cloud Reader group.
+- Verified resource-group read access and a denied tag update.
+
+An Update success record does not establish which attribute changed without inspecting modified properties. The description-field exercise is therefore not claimed as independently validated.
+
+### Phase 4 lessons learned
+
+- The personal Microsoft account sign-in failed during this agent setup; a cloud-native Hybrid Identity Administrator account succeeded. The observed error was not proof that all external identities are unsupported.
+- The provisioning agent should run on a dedicated domain-member server.
+- Security-group scoping requires the exact Active Directory distinguished name.
+- Group-scope filtering evaluates direct members and is best used for controlled pilot scenarios.
+- Successful Create and Update events confirmed the AD-to-Entra synchronization flow.
+- Password hash synchronization and MFA were validated.
+- Group-based Azure RBAC successfully provided Reader access.
+- A denied resource-group tag update confirmed the tested account could not perform that write at the tested scope.
+
+## Phase 5 — Automation in Progress
+
+- Published Terraform data-source configuration; a plan read the existing resource group without planned infrastructure changes.
+- Published and executed AD inventory: 8 users, 64 groups and 4 computers.
+- Published the Python/Azure CLI Entra inventory and reported an initial run; aggregate cloud counts remain unrecorded.
+- Identified field-coverage and error-handling work before treating cloud counts as verified.
+- Kept lifecycle automation, performance measurements and final Phase 5 evidence open.
+
 ## Engineering Lessons Learned
 
 - Group Policy objects do not affect computers until they are linked to the correct OU.
@@ -127,19 +161,12 @@ Phases 0 through 2 have been completed. Phase 3 security-baseline, auditing, fil
 
 ## Remaining Work
 
-- Complete the final Phase 3 implementation evidence.
-- Commit the learning journal and supporting documentation to GitHub.
-- Record the final lessons learned and controlled-failure evidence.
-- Continue to the next phase only after the Phase 3 documentation is complete.
-- Do not begin Azure implementation until the project plan reaches that phase.
+- Validate and harden inventory output, including missing properties and collection edge cases.
+- Complete the planned Graph-specific workflow and controlled lifecycle automation.
+- Record repeat-run, negative-path and dry-run results.
+- Measure execution time and a comparable manual baseline.
+- Continue advanced privilege and non-human identity work only with defined scope and evidence.
 
-## Phase 4 — Hybrid Identity Lessons Learned
+## Portfolio Review — October 5, 2026
 
-- Microsoft Entra Cloud Sync requires a native Entra member account for agent registration; a personal guest identity cannot register the agent.
-- The provisioning agent should run on a dedicated domain-member server.
-- Security-group scoping requires the exact Active Directory distinguished name.
-- Group-scope filtering evaluates direct members and is best used for controlled pilot scenarios.
-- Successful Create and Update events confirmed the AD-to-Entra synchronization flow.
-- Password hash synchronization and MFA were validated.
-- Group-based Azure RBAC successfully provided Reader access.
-- A denied resource-group tag update confirmed that the synchronized user did not have write permissions.
+Reconciled the README and evidence with completed implementation. Separated observed tests from configured settings and future capabilities. The lab does not claim 1,500 deployed accounts, complete privileged-tier enforcement, measured time savings, or production availability. Missing raw exports and remaining validation work are identified explicitly.

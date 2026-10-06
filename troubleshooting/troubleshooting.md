@@ -182,3 +182,53 @@ The GPO editor shows intended configuration, while `gpresult`, registry checks, 
 Testing from the wrong computer can produce misleading results. Verifying `hostname` and the current security context should be an early troubleshooting step.
 
 A missing setting should not be corrected manually on the endpoint until GPO scope, links, permissions, and effective policy have been examined.
+
+## Windows LAPS — Schema and Decryption Permissions
+
+### Observed failures
+
+Schema extension returned insufficient access rights. Later, password-read delegation rejected an unqualified group name, and an authorized recovery attempt initially reported unauthorized decryption.
+
+### Resolution and verification
+
+Schema extension succeeded with temporary Schema Admin membership; removal and a fresh session were reported afterward. Delegation succeeded using the domain-qualified group name. The decryptor SID and group token were reviewed/corrected, after which adm0-jrodriguez could decrypt. A standard-user test from HV-WIN01 returned no password data.
+
+### Lesson and limits
+
+Schema-change permission, directory read permission and encrypted-secret decryption are different checks. Use exact principal identities. The recorded sequence changed both configuration and session context, so it does not isolate a single cause for every decryption failure. A failed standard-user logon to the DC was a logon-right restriction, not the LAPS negative test.
+
+## Cloud Sync — Setup Identity and Service Context
+
+### Evidence
+
+The agent encountered an embedded-browser security block, then an AADSTS50020 authentication-context error with a personal Microsoft account. A native tenant setup account succeeded. The wizard later reported inability to assign service-logon rights and that the current security context was not associated with an AD domain/forest.
+
+### Resolution
+
+The browser restriction was temporarily adjusted for setup and reported restored. The cloud-native setup account used Hybrid Identity Administrator. Temporary direct Domain Admin membership was used for gMSA configuration. Service-account names were inspected; the wizard label and the local policy entry differed. Configuration completed in a domain administrative session, and the service ran afterward.
+
+### Lesson and limits
+
+Check the executing identity, not just whether the machine is domain joined. Use the actual AD/service identity rather than assuming a displayed label is the account's SAM name. Do not infer that every external account is unsupported from one authentication failure. Removal of direct group membership does not prove removal of nested administrative privilege.
+
+## Cloud Sync — Distinguished Names and Pilot Scope
+
+### Evidence
+
+A short input name returned ResourceNotFound. The pilot group's actual DN was in CN=Users, not the planned Groups OU. After scope and identifier corrections, the user appeared and successful Create/Update events were recorded.
+
+One earlier log entry displayed Action Delete with Status Skipped and JoinNotFound.
+
+### Resolution
+
+The exact AD user DN was supplied to on-demand provisioning; the pilot-group DN and direct membership were corrected/verified. Continuous configuration was enabled through Review and enable. User and group presence, expected membership and later updates were confirmed.
+
+### Lesson and limits
+
+An accepted text field does not prove the DN is correct. A skipped Delete event does not prove an object was deleted. Successful Update status alone does not prove a specific field propagated; inspect modified properties and mappings before making that claim.
+
+## Script Transfer — Raw URL Returned 404
+
+The inventory download failed with 404. The failed screenshot used GetHVADInventory.ps1, while the committed filename was Get-HVADInventory.ps1. The error alone did not establish whether the repository was private.
+
+A temporary local transfer succeeded; the HTTP server was stopped. The script ran and reported 8 users, 64 groups and 4 computers. Exact filenames and paths should be checked before changing credentials or repository access.

@@ -76,12 +76,12 @@ A password manager should be used for lab credentials. Temporary workforce passw
 The current controls include:
 
 - Separate standard and Tier 0 accounts
-- Role-group-based Domain Admin authorization
+- Initial role-group-based Domain Admin authorization; effective nested membership requires review
 - Routine use of the built-in Administrator account discontinued
 - Emergency-only description applied to the SID-500 account
 - Tier 0 credentials excluded from `HV-WIN01`
 - Offline domain join used for the workstation
-- Separate local workstation recovery account
+- Separate local workstation recovery account protected by Windows LAPS
 
 Some restrictions are currently procedural rather than technically enforced. Stronger enforcement through Group Policy, auditing, privileged access workstations, and future PAM controls will be introduced in later phases.
 
@@ -94,3 +94,11 @@ This policy must be reviewed when:
 - Account tiers or administrative roles change.
 - A privileged credential is suspected of exposure.
 - The built-in Administrator account is used.
+
+## Implementation Update — October 5, 2026
+
+Windows LAPS stores the workstation recovery password encrypted in AD. Its configured reader/decryptor group is GG-Role-LAPS-Password-Readers. Authorized decryption and a standard-user negative test were recorded. The 30-day rotation and eight-hour post-authentication action are configured, but timed behavior has not been separately demonstrated.
+
+Cloud Sync runs under a gMSA on identity-sensitive HV-SYNC01. A cloud-native setup account was assigned Hybrid Identity Administrator. Temporary direct Domain Admin membership was reported removed after agent setup. Earlier scripts nested GG-Priv-T0-ADAdmins into Domain Admins, so direct-membership removal alone is not proof that adm0-jrodriguez lost all effective Domain Admin privilege. Active tokens also need refresh.
+
+The policy's credential-isolation requirements are operating rules and design goals; the repository does not claim technical enforcement or verified adherence in every setup session. Review nested privileges, setup-role assignments and workstation restrictions before describing this as a fully tier-isolated environment.

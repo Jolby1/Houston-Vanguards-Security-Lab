@@ -9,6 +9,8 @@ terraform {
 
 provider "azurerm" {
   features {}
+  # Discovery should not request subscription-level provider registration.
+  resource_provider_registrations = "none"
 }
 
 data "azurerm_subscription" "current" {}

@@ -50,3 +50,9 @@ Thumbs.db
 *.tmp
 *.swp
 *~
+
+# Local identity reports and offline-domain-join secrets
+HV-AD-Inventory.json
+HV-Entra-Inventory.json
+*-odj.txt
+reports/private/

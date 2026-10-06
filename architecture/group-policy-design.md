@@ -6,6 +6,10 @@ This document defines the initial Group Policy architecture for the Houston Vang
 
 The design separates policies by purpose and scope so they can be tested, audited, disabled, or rolled back independently.
 
+## Implementation Status — October 5, 2026
+
+All three named workstation GPOs below were created and linked to the Workstations OU. The baseline, audit events and LAPS encrypted backup/access tests were validated. The design lists intended control categories; exact recorded results are in [Phase 3 evidence](../documentation/phase-3-implementation-evidence.md). Broader planned categories are not automatically claims of validated settings.
+
 ## Processing Model
 
 Group Policy normally processes in this order:
@@ -76,7 +80,7 @@ Audit settings are separated from the general baseline to make evidence collecti
 **Link location:** Workstations OU  
 **Configuration focus:** Computer Configuration
 
-This GPO will be created only after Windows LAPS prerequisites, storage location, permissions, and recovery procedures have been evaluated.
+This GPO was created after schema preparation and permission delegation. It manages HVLocalAdmin with encrypted AD backup, 20-character passwords, 30-day rotation and an eight-hour post-authentication reset/logoff policy. See Phase 3 evidence for the distinction between configured settings and tested outcomes.
 
 ## Initial Scope
 
@@ -131,4 +135,3 @@ For each GPO:
 - Separate policies by purpose when doing so improves testing and rollback.
 - Prefer evidence from effective policy over assuming that a configured GPO applied.
 - Test changes on the lab workstation before expanding their scope.
-

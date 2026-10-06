@@ -57,7 +57,7 @@ Create a libvirt NAT network using the following initial design:
 - Active Directory forest: `corp.hv-lab.test`
 - NetBIOS domain: `HVL`
 
-Initial systems will use:
+Original proposed assignments (historical; the current implementation is documented below):
 
 - `HV-DC01`: `10.50.10.10`
 - `HV-LNX01`: `10.50.10.30`
@@ -84,6 +84,8 @@ Initial systems will use:
 - The domain controller and other infrastructure systems require controlled address assignments.
 - Domain clients must use the domain controller for DNS rather than public or household DNS.
 - The NAT boundary is useful isolation but is not a substitute for host and guest security controls.
+
+> Implementation update, October 5, 2026: `10.50.10.30` is assigned to `HV-SYNC01`; the proposed Linux guest was not deployed. `HV-WIN01` uses DHCP. See [current architecture](architecture-notes.md).
 
 ## ADR-003 — Begin at Windows Server 2016 AD Functional Level
 
@@ -223,3 +225,33 @@ Deferred because the Workstations OU already provides a clear initial scope. Add
 - Troubleshooting may require examining several policies.
 - The design provides clearer ownership, safer testing, and more precise rollback.
 - Additional GPOs may be introduced later as new security requirements appear.
+
+## ADR-006 — Use a Dedicated Cloud Sync Pilot
+
+- **Status:** Accepted and implemented in Phase 4; recorded retrospectively October 5, 2026.
+
+### Context and Decision
+
+Integrate a representative workforce identity with Entra before expanding synchronization. Run Cloud Sync on a dedicated domain-member server, HV-SYNC01, using a gMSA. Scope AD-to-Entra provisioning to the pilot security group's direct membership. Use the tenant onmicrosoft.com suffix for the cloud account while retaining the internal .test domain.
+
+### Rationale and Alternatives
+
+This fits the exercised user/group and password-hash synchronization requirements with a limited initial scope. Entra Connect Sync was considered during planning; this decision does not claim feature equivalence or a benchmark comparison. Broad directory synchronization was deferred to avoid including privileged and unrelated objects.
+
+### Consequences
+
+The exact group DN and membership matter. The single agent provides no demonstrated failover. The pilot's cloud Reader membership is maintained separately from sync scope. The default accidental-deletion threshold needs review before scope expansion.
+
+See [hybrid design](../architecture/entra-hybrid-identity-design.md) and [Phase 4 evidence](phase-4-hybrid-identity-evidence.md).
+
+## ADR-007 — Begin Automation with Discovery and Explicit Evidence
+
+- **Status:** Accepted; Phase 5 in progress, recorded October 5, 2026.
+
+### Decision
+
+Start with AD/Entra inventories and Terraform data sources. Keep raw identity reports and local state out of Git. Publish aggregate observations and retain the provider lock file. Disable AzureRM automatic provider registration for the discovery configuration.
+
+### Rationale and Consequences
+
+Discovery builds familiarity with authentication, API output and serialization before lifecycle changes. Successful execution does not alone prove correct totals; field coverage, pagination and failure handling need validation. Existing lab provisioning scripts provide WhatIf previews but do not constitute a complete lifecycle engine. Terraform resource deployment and time-saving metrics remain future deliverables.

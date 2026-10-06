@@ -197,3 +197,11 @@ The following group types will be used:
 - Group naming and nesting must remain consistent.
 - Troubleshooting requires checking each layer of the authorization chain.
 - Incorrect group nesting could grant excessive access.
+
+## Implementation Status — October 5, 2026
+
+The OU model, standard/Tier 0 identities, sample workforce users and initial AGDLP groups were implemented. Both IT-share paths were tested: jrodriguez has read/write through the IT department group; mchen has read-only through GG-Role-IT-Shared-Readers. See [test results](../documentation/phase-3-implementation-evidence.md).
+
+The Tier 1/Tier 2 account names and application service-account names above are design examples, not assertions that every example exists. The current gMSA serves Cloud Sync. Full administrative-tier enforcement and application identity governance remain incomplete.
+
+GG-Cloud-Sync-Pilot currently resides in the built-in Users container, with jrodriguez as a direct member. Its exact DN is recorded in the [hybrid design](../architecture/entra-hybrid-identity-design.md). Cloud-managed HV-Cloud-Identity-Readers is separate from the synchronized group and grants Azure Reader access.

@@ -1,5 +1,7 @@
 # Houston Vanguards Hybrid Identity Security Engineering Lab
 
+> **Document status:** Original project charter and learning goals. Historical Phase 0 instructions and the final portfolio story below describe the plan, not current completion. As of October 5, 2026, Phases 0–4 are complete and Phase 5 is in progress. See [current status](project-status.md) and [evidence](evidence-index.md). The modeled 1,500 identities are not a deployed account count.
+
 ## Project Purpose
 
 This project exists to transform my cybersecurity resume from an experienced security analyst profile into a credible **IAM/PAM Engineer with Azure security engineering capabilities**.
